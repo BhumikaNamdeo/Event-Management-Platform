@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { loadStripe } from "@stripe/stripe-js";
 import Footer from "./Footer";
-
+import { API_BASE } from "../config";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
 const EventDetails = () => {
@@ -27,7 +27,7 @@ const EventDetails = () => {
       const token = localStorage.getItem("token");
       try {
         const res = await axios.get(
-          `http://localhost:5000/event/viewDetail/${id}`,
+          `${API_BASE}/event/viewDetail/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setEvent(res.data);
@@ -61,7 +61,7 @@ const EventDetails = () => {
     try {
       const stripe = await stripePromise;
       const res = await axios.post(
-        "http://localhost:5000/payment/create-checkout-session",
+        `${API_BASE}/payment/create-checkout-session`,
         {
           eventId: id,
           tickets: [

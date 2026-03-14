@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNavBar from "../components/SideNavBar";
+import { API_BASE } from "../config";
 
 function EventForm() {
     const [title, setTitle] = useState("");
@@ -36,7 +37,7 @@ function EventForm() {
             const token = localStorage.getItem("token");
             console.log("Token from localStorage:", token);
 
-            const response = await fetch("http://localhost:5000/event/create/event", {
+            const response = await fetch(`${API_BASE}/event/create/event`, {
                 method: "POST",
                 body: formData,
                 headers: {

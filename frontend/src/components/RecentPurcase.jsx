@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_BASE } from '../config';
 
 const RecentPurchase = ({ eventId }) => {
   const [bookings, setBookings] = useState([]);
@@ -10,7 +11,7 @@ const RecentPurchase = ({ eventId }) => {
     const fetchBookings = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/booking/all", {
+        const response = await axios.get(`${API_BASE}/booking/all`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

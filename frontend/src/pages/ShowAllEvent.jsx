@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import EventCard from "../components/EventCard";
 import axios from "axios";
 import SideNavBar from "../components/SideNavBar";
+import { API_BASE } from "../config";
 
 const ShowAllEvent = () => {
   const [events, setEvents] = useState([]);
@@ -13,7 +14,7 @@ const ShowAllEvent = () => {
   const fetchEvents = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("http://localhost:5000/event/allEvent", {
+      const res = await axios.get(`${API_BASE}/event/allEvent`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

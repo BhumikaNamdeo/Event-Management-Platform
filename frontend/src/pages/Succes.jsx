@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE } from "../config";
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -17,7 +18,7 @@ const PaymentSuccess = () => {
       try {
         if (bookingId) {
           const res = await axios.post(
-            "http://localhost:5000/payment/update-status",
+            `${API_BASE}/payment/update-status`,
             { bookingId }
           );
           console.log("Payment status updated:", res.data);
@@ -40,7 +41,7 @@ const PaymentSuccess = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/payment/ticket/${bookingId}`,
+        `${API_BASE}/payment/ticket/${bookingId}`,
         {
           responseType: "blob", // PDF receive karne ke liye
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

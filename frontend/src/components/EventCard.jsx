@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import 'remixicon/fonts/remixicon.css';
+import { API_BASE } from "../config";
 
 const EventCard = ({ event }) => {
   // Safely log the tickets array
   console.log("Tickets:", event.tickets);
 
     const imageUrl = event.image
-    ? `http://localhost:5000/uploads/${event.image}`
+    ? `${API_BASE}/uploads/${event.image}`
     : "https://images.unsplash.com/photo-1596949469909-5217f8b68f23?q=80&w=2070";
 
   // Get lowest price if tickets array exists

@@ -3,6 +3,7 @@ import axios from "axios";
 import Footer from "../components/Footer";
 import { Search, MapPin, Calendar, Clock, Heart, Share2, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { API_BASE } from "../config";
 
 
 const Explore = () => {
@@ -22,7 +23,7 @@ const Explore = () => {
     const fetchEvents = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/event/allEvent", {
+        const res = await axios.get(`${API_BASE}/event/allEvent`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -150,7 +151,7 @@ const Explore = () => {
 >
   <Link to={`/event/view`}>
     <img
-      src={`http://localhost:5000/uploads/${event.image}`}
+      src={`${API_BASE}/uploads/${event.image}`}
       alt={event.title}
       className="w-full h-80 object-cover cursor-pointer"
     />

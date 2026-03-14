@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { DollarSign } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const getStatusBadgeStyle = (color) => {
   const baseClasses = "inline-block whitespace-nowrap px-2 py-2 w-18 rounded text-[12px] font-medium leading-tight";
@@ -22,7 +23,7 @@ const UserDetail = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/booking/sale", {
+        const res = await axios.get(`${API_BASE}/booking/sale`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -93,7 +94,7 @@ const UserDetail = () => {
                 {sortedEvents.map((item, index) => {
                   const event = item.event;
                   const imageUrl = event?.image
-                    ? `http://localhost:5000/uploads/${event.image}`
+                    ? `${API_BASE}/uploads/${event.image}`
                     : "https://images.unsplash.com/photo-1596949469909-5217f8b68f23?q=80&w=2070";
 
                   return (

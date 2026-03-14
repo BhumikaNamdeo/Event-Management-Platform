@@ -5,6 +5,7 @@ import StatCard from "../components/StatCard";
 import SideNavBar from "../components/SideNavBar";
 import UserDetail from "../components/UserDetail";
 import RecentPurcase from "../components/RecentPurcase";
+import { API_BASE } from "../config";
 const OrganizerDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     totalEvents: 0,
@@ -21,7 +22,7 @@ const OrganizerDashboard = () => {
 
       try {
         const response = await axios.get(
-          "http://localhost:5000/organizer/dashboard-data",
+          `${API_BASE}/organizer/dashboard-data`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
