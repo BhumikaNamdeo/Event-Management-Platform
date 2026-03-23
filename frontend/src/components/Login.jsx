@@ -24,9 +24,7 @@ function AuthForm() {
       : { email, password };
 
     try {
-      const res = await axios.post(url, payload, {
-        withCredentials: true 
-      });
+      const res = await axios.post(url, payload);
       console.log("Response:", res.data);
 
       if ((res.status === 200 || res.status === 201) && res.data.token) {
