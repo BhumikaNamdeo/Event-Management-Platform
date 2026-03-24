@@ -56,6 +56,9 @@ const PaymentSuccess = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      setTimeout(() => {
+        navigate("/explore");
+      }, 2000); // 2 seconds ka delay taaki download start ho sake
     } catch (error) {
       console.error("Failed to download ticket", error);
       alert("Failed to download ticket.");
