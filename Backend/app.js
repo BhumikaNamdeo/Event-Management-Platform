@@ -19,6 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 connectDB();
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 app.use(cookieParser());
 console.log("CORS Origin:", process.env.FRONTEND_URL);
 // app.use(
@@ -38,7 +44,7 @@ app.use(
   cors({
     origin: [
       "https://event-management-platform-peach.vercel.app", // Aapka actual Vercel link
-      "http://localhost:5173"
+      // "http://localhost:5173"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
