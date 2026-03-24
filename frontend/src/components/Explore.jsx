@@ -19,6 +19,23 @@ const Explore = () => {
 
   const eventsPerPage = 8;
 
+  const handleDelete = async (eventId) => {
+  const token = localStorage.getItem("token");
+  if (window.confirm("Are you sure you want to delete this event?")) {
+    try {
+      await axios.delete(`${API_BASE}/event/create/event/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEvents(events.filter((e) => e._id !== eventId));
+      setFilteredEvents(filteredEvents.filter((e) => e._id !== eventId));
+      alert("Event deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting event.");
+    }
+  }
+};
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -147,8 +164,15 @@ const Explore = () => {
               return (
                <div
   key={event._id}
-  className="bg-white rounded-lg overflow-hidden shadow"
+  className="
+ relative group bg-white rounded-lg overflow-hidden shadow"
 >
+  <button 
+      onClick={() => handleDelete(event._id)}
+      className="absolute top-3 right-3 bg-white/90 hover:bg-red-500 hover:text-white text-red-500 p-2 rounded-full transition-all duration-300 z-10 opacity-0 group-hover:opacity-100 shadow-md border border-red-100"
+    >
+      <i className="ri-delete-bin-line text-xl cursor-pointer"></i>
+    </button>
   <Link to={`/event/view`}>
     <img
       src={`${API_BASE}/uploads/${event.image}`}
