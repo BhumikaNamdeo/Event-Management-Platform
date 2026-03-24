@@ -168,81 +168,135 @@ exports.downloadTicketPDF = async (req, res) => {
   }
 };
 
-exports.generateTicket = async (req, res) => {
+// exports.generateTicket = async (req, res) => {
+//   try {
+//     const { bookingId } = req.params;
+
+//     if (!bookingId) {
+//       return res.status(400).json({ error: "Booking ID is required" });
+//     }
+
+//     const booking = await Booking.findById(bookingId).populate("eventId");
+//     if (!booking) {
+//       return res.status(404).json({ error: "Booking not found" });
+//     }
+
+//     const event = booking.eventId;
+
+//     const qrCodeDataURL = await QRCode.toDataURL(`${bookingId}`);
+
+//     const doc = new PDFDocument({ size: "A4", margin: 50 });
+
+//     res.setHeader("Content-Type", "application/pdf");
+//     res.setHeader(
+//       "Content-Disposition",
+//       `attachment; filename=ticket-${bookingId}.pdf`
+//     );
+
+//     doc.pipe(res);
+
+//     doc.fontSize(24).text("🎫 Event Ticket", { align: "center" });
+//     doc.moveDown();
+
+//     doc.fontSize(16).text(`Name: ${booking.firstName} ${booking.lastName}`);
+//     doc.text(`Phone: ${booking.phone}`);
+//     doc.text(`Email: ${booking.email}`);
+//     doc.moveDown();
+
+//     doc.text(`Event Title: ${event.title}`);
+//     doc.text(`Category: ${event.category}`);
+//     doc.text(`Date: ${new Date(event.date).toLocaleDateString("en-IN")}`);
+//     doc.text(`Time: ${event.time}`);
+//     doc.text(`Location: ${event.venue}`);
+//     doc.moveDown();
+
+//     doc.text("Tickets Booked:");
+//     booking.tickets.forEach((ticket, idx) => {
+//       doc.text(
+//         `  ${idx + 1}. ${ticket.type} - Quantity: ${
+//           ticket.quantity
+//         } - Price per ticket: ₹${ticket.price} - Subtotal: ₹${ticket.subtotal}`
+//       );
+//     });
+//     doc.moveDown();
+
+//     doc.text(`Total Amount Paid: ₹${booking.totalAmount}`);
+//     doc.text(`Payment Status: ${booking.paymentStatus}`);
+//     doc.text(
+//       `Booking Date: ${new Date(booking.createdAt).toLocaleDateString("en-IN")}`
+//     );
+//     doc.moveDown();
+
+//     // QR code embed
+//     const qrImageBuffer = Buffer.from(qrCodeDataURL.split(",")[1], "base64");
+//     doc.image(qrImageBuffer, { fit: [150, 150], align: "center" });
+//     doc.moveDown();
+
+//     doc.text("Thank you for your booking!", { align: "center" });
+
+//     doc.end();
+//   } catch (error) {
+//     console.error("Ticket generation error:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+
+exports.downloadTicketPDF = async (req, res) => {
   try {
     const { bookingId } = req.params;
-
-    if (!bookingId) {
-      return res.status(400).json({ error: "Booking ID is required" });
-    }
-
     const booking = await Booking.findById(bookingId).populate("eventId");
-    if (!booking) {
-      return res.status(404).json({ error: "Booking not found" });
-    }
+
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
 
     const event = booking.eventId;
-
     const qrCodeDataURL = await QRCode.toDataURL(`${bookingId}`);
 
+    // Change 2: Using PDFKit instead of Puppeteer for speed on Render
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=ticket-${bookingId}.pdf`
-    );
+    res.setHeader("Content-Disposition", `attachment; filename=ticket-${bookingId}.pdf`);
 
     doc.pipe(res);
 
-    doc.fontSize(24).text("🎫 Event Ticket", { align: "center" });
+    // Header
+    doc.fontSize(26).fillColor("#1a5f7a").text("🎟 EVENT TICKET", { align: "center" });
+    doc.moveDown();
+    doc.strokeColor("#cccccc").moveTo(50, 100).lineTo(550, 100).stroke();
+
+    // Details
+    doc.moveDown().fillColor("#000000").fontSize(14).text(`Customer: ${booking.firstName} ${booking.lastName}`);
+    doc.text(`Phone: ${booking.phone} | Email: ${booking.email}`);
     doc.moveDown();
 
-    doc.fontSize(16).text(`Name: ${booking.firstName} ${booking.lastName}`);
-    doc.text(`Phone: ${booking.phone}`);
-    doc.text(`Email: ${booking.email}`);
-    doc.moveDown();
-
-    doc.text(`Event Title: ${event.title}`);
-    doc.text(`Category: ${event.category}`);
-    doc.text(`Date: ${new Date(event.date).toLocaleDateString("en-IN")}`);
-    doc.text(`Time: ${event.time}`);
+    doc.fontSize(16).fillColor("#1a5f7a").text("EVENT DETAILS");
+    doc.fontSize(14).fillColor("#000000").text(`Event: ${event.title}`);
     doc.text(`Location: ${event.venue}`);
+    doc.text(`Date: ${new Date(event.date).toLocaleDateString("en-IN")} | Time: ${event.time}`);
     doc.moveDown();
 
-    doc.text("Tickets Booked:");
-    booking.tickets.forEach((ticket, idx) => {
-      doc.text(
-        `  ${idx + 1}. ${ticket.type} - Quantity: ${
-          ticket.quantity
-        } - Price per ticket: ₹${ticket.price} - Subtotal: ₹${ticket.subtotal}`
-      );
+    doc.text("TICKETS:");
+    booking.tickets.forEach((t) => {
+      doc.fontSize(12).text(`- ${t.type}: ${t.quantity} x ₹${t.price} = ₹${t.subtotal}`);
     });
-    doc.moveDown();
 
-    doc.text(`Total Amount Paid: ₹${booking.totalAmount}`);
-    doc.text(`Payment Status: ${booking.paymentStatus}`);
-    doc.text(
-      `Booking Date: ${new Date(booking.createdAt).toLocaleDateString("en-IN")}`
-    );
-    doc.moveDown();
+    doc.moveDown().fontSize(18).text(`Total Paid: ₹${booking.totalAmount}`, { bold: true });
 
-    // QR code embed
+    // Change 3: Embed QR Code at the bottom
     const qrImageBuffer = Buffer.from(qrCodeDataURL.split(",")[1], "base64");
-    doc.image(qrImageBuffer, { fit: [150, 150], align: "center" });
-    doc.moveDown();
-
-    doc.text("Thank you for your booking!", { align: "center" });
+    doc.image(qrImageBuffer, 400, 500, { width: 120 });
+    
+    doc.fontSize(10).fillColor("gray").text("Please show this QR at the venue.", 50, 700);
 
     doc.end();
   } catch (error) {
-    console.error("Ticket generation error:", error);
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+    console.error("Ticket error:", error);
+    res.status(500).json({ error: "Could not generate ticket" });
   }
 };
-
 exports.updatePaymentStatus = async (req, res) => {
   const { bookingId } = req.body;
   if (!bookingId) {

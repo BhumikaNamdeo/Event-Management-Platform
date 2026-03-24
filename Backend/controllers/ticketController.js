@@ -51,6 +51,7 @@ exports.downloadTicketPDF = async (req, res) => {
     if (!booking) return res.status(404).json({ error: "Booking not found" });
 
     const event = booking.eventId;
+    
 
     const ticketData = {
       firstName: booking.firstName,
