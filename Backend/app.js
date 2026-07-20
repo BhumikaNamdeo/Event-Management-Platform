@@ -27,35 +27,40 @@ if (!fs.existsSync(uploadDir)) {
 }
 app.use(cookieParser());
 console.log("CORS Origin:", process.env.FRONTEND_URL);
-// app.use(
-//   cors({
-//     origin: process.env.FRONTEND_URL,
-//     credentials: true,}));
-// app.use(
-//   cors({
-//     origin: [
-//       "https://your-frontend-name.vercel.app", // Yahan apna Vercel wala link daaliye
-//       "http://localhost:5173"                // Taaki local pe bhi chalta rahe
-//     ],
-//     credentials: true
-//   })
-// );
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://event-management-platform-peach.vercel.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "https://event-management-platform-peach.vercel.app", // Aapka actual Vercel link
-      // "http://localhost:5173"
-    ],
+    origin: function (origin, callback) {
+      // Postman ya server-to-server requests ke liye jahan origin nahi hota
+      if (!origin) return callback(null, true);
+      
+      // Agar origin list mein hai, ya URL .vercel.app par end hota hai toh allow karein
+      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS policy'));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 // app.use(
-//   session({
-//     secret: process.env.JWT_SECRET,
-//     resave: false,
-//     saveUninitialized: false,}));
+//   cors({
+//     origin: [
+//       "https://event-management-platform-peach.vercel.app", // Aapka actual Vercel link
+//       "http://localhost:5173"
+//     ],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"]
+//   })
+// );
 app.set("trust proxy", 1); // Render backend ke liye zaroori hai
 app.use(
   session({
